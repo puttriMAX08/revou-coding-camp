@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Traffic Light Simulator</title>
+		<style>
+			body {
+				font-family: Arial;
+				background: #f4f4f4;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				margin-top: 60px;
+			}
+
+			.traffic-light {
+				width: 120px;
+				background: #222;
+				padding: 20px;
+				border-radius: 20px;
+			}
+
+			.light {
+				width: 70px;
+				height: 70px;
+				background: #444;
+				margin: 15px auto;
+				border-radius: 50%;
+				transition: background 0.3s;
+			}
+
+			button {
+				margin-top: 25px;
+				padding: 10px 20px;
+				border: none;
+				background: #4a90e2;
+				color: #fff;
+				cursor: pointer;
+				border-radius: 8px;
+				font-size: 16px;
+			}
+
+			button:hover {
+				background: #357ac9;
+			}
+
+			button:disabled {
+				background: #aaa;
+				cursor: not-allowed;
+				opacity: 0.6;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="traffic-light">
+			<div id="red" class="light"></div>
+			<div id="yellow" class="light"></div>
+			<div id="green" class="light"></div>
+		</div>
+
+		<button id="switchBtn">Switch Traffic Light</button>
+
+		<script src="app.js"></script>
+	</body>
+</html>
