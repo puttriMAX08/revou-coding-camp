@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cat Petting App</title>
+
+  <!-- Load Tailwind CSS via CDN — no build step required (Requirement 7.5, 8.3) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* === SQUISH ANIMATION === */
+    @keyframes squish {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.15, 0.85); }
+      60%  { transform: scale(0.9, 1.1); }
+      100% { transform: scale(1); }
+    }
+    .squish { animation: squish 300ms ease forwards; }
+
+    /* === PARTICLE SYSTEM === */
+    @keyframes floatFade {
+      0%   { transform: translateY(0);     opacity: 1; }
+      100% { transform: translateY(-80px); opacity: 0; }
+    }
+    .particle {
+      animation: floatFade 1000ms ease forwards;
+      position: fixed;
+      pointer-events: none;
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+
+    /* === MILESTONES === */
+    /* Smooth background transition when a milestone class is applied/removed */
+    body {
+      transition: background-color 0.6s ease;
+    }
+
+    /* Milestone 1 (≥50 pets): warm peach background */
+    body.milestone-1 {
+      background-color: #ffd6b0 !important;
+    }
+
+    /* Milestone 2 (≥100 pets): soft mint background + happy glow on cat SVG */
+    body.milestone-2 {
+      background-color: #b0f0d6 !important;
+    }
+    body.milestone-2 #cat svg {
+      filter: drop-shadow(0 0 12px #86efac);
+    }
+
+    /* Milestone 3 (≥200 pets): golden background + sparkle/crown accent on cat */
+    body.milestone-3 {
+      background-color: #ffe066 !important;
+    }
+    body.milestone-3 #cat svg {
+      filter: drop-shadow(0 0 16px #fbbf24) drop-shadow(0 0 6px #f59e0b);
+    }
+    /* Sparkle crown accent shown at milestone 3 */
+    body.milestone-3 #cat {
+      position: relative;
+    }
+    body.milestone-3 #cat::before {
+      content: "👑";
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      pointer-events: none;
+      animation: floatFade 2s ease infinite alternate;
+    }
+  </style>
+</head>
+
+<!-- Soft pastel lavender background (Requirement 7.1) -->
+<!-- Centered flex layout — all content centered horizontally and vertically (Requirement 7.3) -->
+<body class="bg-[#e9e4f0] min-h-screen flex flex-col items-center justify-center transition-colors duration-[600ms] ease-in-out">
+
+  <!-- === LAYOUT === -->
+  <!-- Main content wrapper: centers cat, counter, and particles -->
+  <div class="flex flex-col items-center gap-6">
+
+    <!-- === COUNTER LOGIC === -->
+    <!-- Pet counter display: shows total pets given (Requirements 1.1, 1.3) -->
+    <p id="counter" class="text-3xl font-bold text-pink-400 text-center"></p>
+
+    <!-- === CAT DRAWING === -->
+    <!-- Inline SVG cat: head, ears, eyes, nose, whiskers, mouth (Requirements 2.1, 2.2, 2.3) -->
+    <div id="cat" class="cursor-pointer flex items-center justify-center hover:scale-105 transition-transform duration-150">
+      <!--
+        viewBox="0 0 200 200" gives a stable coordinate space.
+        Tailwind w-48 h-48 (192px) is the base size; it scales responsively
+        and remains fully visible from 320px to 1920px viewports.
+      -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 200 200"
+        class="w-48 h-48"
+        aria-label="A cute minimalist cat"
+        role="img"
+      >
+        <!-- Ears (triangles, drawn behind the head) -->
+        <polygon points="55,95 75,45 95,90"  fill="#c8a0d8" />
+        <polygon points="105,90 125,45 145,95" fill="#c8a0d8" />
+        <!-- Inner ear detail -->
+        <polygon points="63,90 75,58 87,88"  fill="#f0c8e0" />
+        <polygon points="113,88 125,58 137,90" fill="#f0c8e0" />
+
+        <!-- Head (circle) -->
+        <circle cx="100" cy="115" r="55" fill="#d8b4e8" />
+
+        <!-- Eyes (circles) -->
+        <circle cx="80"  cy="105" r="9" fill="#2d2d2d" />
+        <circle cx="120" cy="105" r="9" fill="#2d2d2d" />
+        <!-- Eye shine highlights -->
+        <circle cx="83"  cy="102" r="3" fill="white" />
+        <circle cx="123" cy="102" r="3" fill="white" />
+
+        <!-- Nose (small triangle) -->
+        <polygon points="100,120 96,126 104,126" fill="#f48fb1" />
+
+        <!-- Mouth (two short curves using quadratic bezier) -->
+        <path d="M96,126 Q90,133 84,130" stroke="#2d2d2d" stroke-width="2" fill="none" stroke-linecap="round" />
+        <path d="M104,126 Q110,133 116,130" stroke="#2d2d2d" stroke-width="2" fill="none" stroke-linecap="round" />
+
+        <!-- Whiskers — left side -->
+        <line x1="40"  y1="118" x2="88"  y2="122" stroke="#2d2d2d" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="38"  y1="126" x2="88"  y2="126" stroke="#2d2d2d" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="40"  y1="134" x2="88"  y2="130" stroke="#2d2d2d" stroke-width="1.5" stroke-linecap="round" />
+
+        <!-- Whiskers — right side -->
+        <line x1="112" y1="122" x2="160" y2="118" stroke="#2d2d2d" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="112" y1="126" x2="162" y2="126" stroke="#2d2d2d" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="112" y1="130" x2="160" y2="134" stroke="#2d2d2d" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+    </div>
+    <!-- End Cat Drawing -->
+
+  </div>
+  <!-- End Layout -->
+
+  <script>
+    // =====================================================================
+    // === LOCALSTORAGE ===
+    // Persistence helpers: loadCount() and saveCount() (Requirements 1.4, 1.5, 6.1, 6.2, 6.3)
+    // =====================================================================
+
+    const STORAGE_KEY = "cat_pet_count";
+
+    /**
+     * loadCount()
+     * Reads and validates the stored pet count from localStorage.
+     * Returns a non-negative integer, or 0 as fallback.
+     */
+    function loadCount() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = parseInt(raw, 10);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    /**
+     * saveCount(n)
+     * Persists n to localStorage. Silently swallows errors (e.g. private browsing).
+     */
+    function saveCount(n) {
+      try {
+        localStorage.setItem(STORAGE_KEY, String(n));
+      } catch (e) {
+        // Storage unavailable; continue without persistence
+      }
+    }
+
+    // =====================================================================
+    // === COUNTER LOGIC ===
+    // =====================================================================
+
+    // Single source of truth for the pet count — restored from localStorage on load
+    let petCount = loadCount();
+
+    // Reference to the counter DOM element
+    const counterEl = document.getElementById("counter");
+
+    /**
+     * updateCounterDisplay()
+     * Syncs the counter element's text to the current petCount value.
+     * Called on init and after every click.
+     */
+    function updateCounterDisplay() {
+      counterEl.textContent = "Pets Given: " + petCount;
+    }
+
+    // =====================================================================
+    // === MILESTONES ===
+    // MILESTONES constant and applyMilestone(count) function
+    // Requirements: 5.1, 5.2, 5.3, 5.4
+    // =====================================================================
+
+    /**
+     * MILESTONES
+     * Static ordered array mapping pet count thresholds to CSS class names.
+     * Applied to <body> to drive all milestone visual changes via CSS.
+     */
+    const MILESTONES = [
+      { threshold: 50,  class: "milestone-1" },
+      { threshold: 100, class: "milestone-2" },
+      { threshold: 200, class: "milestone-3" },
+    ];
+
+    /**
+     * applyMilestone(count)
+     * Removes all milestone classes from document.body, then adds the CSS class
+     * for the highest milestone whose threshold is <= count (if any).
+     *
+     * @param {number} count - current pet count
+     */
+    function applyMilestone(count) {
+      // Remove all existing milestone classes
+      for (const m of MILESTONES) {
+        document.body.classList.remove(m.class);
+      }
+
+      // Find the highest applicable milestone (iterate in reverse to get highest first)
+      let applicable = null;
+      for (let i = MILESTONES.length - 1; i >= 0; i--) {
+        if (count >= MILESTONES[i].threshold) {
+          applicable = MILESTONES[i];
+          break;
+        }
+      }
+
+      // Apply the milestone class if one was found
+      if (applicable) {
+        document.body.classList.add(applicable.class);
+      }
+    }
+
+    // --- Initialization ---
+    // Restore persisted count, render display, and apply any saved milestone (Requirements 1.1, 1.3, 1.4)
+    updateCounterDisplay();
+    applyMilestone(petCount);
+
+    // =====================================================================
+    // === SQUISH ANIMATION ===
+    // triggerSquish() — adds/removes the .squish CSS class on #cat
+    // Requirements: 3.1, 3.2, 3.3
+    // =====================================================================
+
+    /**
+     * triggerSquish()
+     * Adds the .squish CSS class to #cat to play the squish keyframe animation,
+     * then removes it after 300ms so the animation can be re-triggered on the
+     * next click. (Requirements 3.1, 3.2, 3.3)
+     */
+    function triggerSquish() {
+      const catEl = document.getElementById("cat");
+      catEl.classList.add("squish");
+      setTimeout(function () {
+        catEl.classList.remove("squish");
+      }, 300);
+    }
+
+    // =====================================================================
+    // === PARTICLE SYSTEM ===
+    // spawnParticle(x, y) — creates floating emoji/text particles on click
+    // Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
+    // =====================================================================
+
+    /**
+     * spawnParticle(x, y)
+     * Creates a floating text particle at the click coordinates, animates it
+     * upward while fading out, then removes it from the DOM on animationend.
+     * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
+     *
+     * @param {number} x - click clientX position (pixels from left)
+     * @param {number} y - click clientY position (pixels from top)
+     */
+    function spawnParticle(x, y) {
+      const texts = ["Meow!", "Purr...", "❤️", "✨"];
+      const el = document.createElement("span");
+      el.className = "particle";
+      el.style.left = x + "px";
+      el.style.top  = y + "px";
+      el.textContent = texts[Math.floor(Math.random() * texts.length)];
+      document.body.appendChild(el);
+      el.addEventListener("animationend", function () {
+        el.remove();
+      });
+    }
+
+    // =====================================================================
+    // === CLICK HANDLER ===
+    // incrementAndSave(x, y) — orchestrates all per-click updates
+    // Requirements: 1.2, 1.3
+    // =====================================================================
+
+    /**
+     * incrementAndSave(x, y)
+     * Increments petCount by 1, persists to localStorage, syncs the display,
+     * and triggers all visual side effects (squish, particle, milestone).
+     *
+     * @param {number} x - click clientX, forwarded to spawnParticle
+     * @param {number} y - click clientY, forwarded to spawnParticle
+     */
+    function incrementAndSave(x, y) {
+      petCount += 1;
+      saveCount(petCount);
+      updateCounterDisplay();
+      triggerSquish();
+      spawnParticle(x, y);
+      applyMilestone(petCount);
+    }
+
+    // Attach click listener to the cat element (Requirements 1.2, 1.3)
+    document.getElementById("cat").addEventListener("click", function (event) {
+      incrementAndSave(event.clientX, event.clientY);
+    });
+  </script>
+
+</body>
+</html>
